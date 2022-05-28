@@ -12,18 +12,22 @@ import java.awt.event.KeyListener;
 public class App extends Canvas implements Runnable, KeyListener {
 
     private static final long serialVersionUID = 1L;
-    public static int WIDTH = 240;
-    public static int HEIGHT = 120;
+    public static int WIDTH = 120;
+    public static int HEIGHT = 160;
     public static int SCALE = 3;
 
     public BufferedImage layer = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-    public Player player;
+    public static Player player;
+    public static Enemy enemy;
+    public static Ball ball;
 
     public App() {
         this.setPreferredSize(new DimensionUIResource(WIDTH * SCALE, HEIGHT * SCALE));
         this.addKeyListener(this);
-        player = new Player(100, HEIGHT - 10);
+        player = new Player(40, HEIGHT - 3);
+        enemy = new Enemy(40, 0);
+        ball = new Ball(40, (HEIGHT / 2) - 1);
     }
 
     public static void main(String[] args) {
@@ -41,6 +45,14 @@ public class App extends Canvas implements Runnable, KeyListener {
 
     public void tick() {
         player.tick();
+        enemy.tick();
+        ball.tick();
+    }
+
+    public void renderObjects(Graphics g) {
+        player.render(g);
+        enemy.render(g);
+        ball.render(g);
     }
 
     public void render() {
@@ -58,15 +70,17 @@ public class App extends Canvas implements Runnable, KeyListener {
         // Definindo g como uma Layer
         Graphics g = layer.getGraphics();
 
+        // Renderizando background
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, WIDTH, HEIGHT);
 
-        // Renderizando Layer Player
-        player.render(g);
+        // Renderizando Layers
+        renderObjects(g);
     }
 
     public void run() {
         while (true) {
+            requestFocus();
             tick();
             render();
             try {
